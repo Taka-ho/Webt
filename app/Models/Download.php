@@ -4,28 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Download extends Model
 {
     use HasFactory;
     function countFiles () {
-        $path = base_path('workBook');
-        $getAllFiles = array_values(array_diff(scandir($path), array('..', '.')));
-        $numOfFiles = 0;
-        if ($getAllFiles != false) {
-            $numOfFiles = count($getAllFiles);
-        }
+        $allWorkBook = Storage::allFiles('workBook');
+        $numOfFiles = count($allWorkBook);
         return $numOfFiles;
     }
 
-    function chooseOneFile () {
+    function download () {
         $min = 1;
         $max = $this->countFiles();
         $numOfWork = rand($min, $max);
-        $this->download ($numOfWork.'.txt');
-    }
-
-    function download ($fileName) {
-        
+        $fileName = $numOfWork.'.txt';
+        return Storage::download('workBook/'.$fileName);
     }
 }

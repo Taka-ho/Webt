@@ -9,6 +9,6 @@ class DownloadController extends Controller
 {
     function index () {
         $download = new Download;
-        return $download->chooseOneFile();
+        return $download->download();
     }
 }
