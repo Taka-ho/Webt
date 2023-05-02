@@ -52,7 +52,7 @@
                 </p>
                 <pre class='command-space'>unzip exam</pre>
                 <p>
-                    で問題のZipファイルの中身を解凍します。<br>
+                    で問題の入ったzipファイルの中身を解凍します。<br>
                 </p>
                 <div class='encourage-part'>
                     <h2>

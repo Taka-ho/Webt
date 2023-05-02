@@ -24,3 +24,4 @@ Route::get('/exam', function () {
 
 Route::get('/exam/workBook', [DownloadController::class, 'index']);
 
+Route::get('/exam/workBook/test-code', [DownloadController::class, 'index']);
