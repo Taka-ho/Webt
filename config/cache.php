@@ -106,5 +106,10 @@ return [
     */
 
     'prefix' => env('CACHE_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_cache_'),
-
+    
 ];
+Schema::create('cache', function ($table) {
+    $table->string('key')->unique();
+    $table->text('value');
+    $table->integer('expiration');
+});

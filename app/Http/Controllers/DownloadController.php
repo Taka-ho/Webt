@@ -7,7 +7,7 @@ use App\Models\Download;
 
 class DownloadController extends Controller
 {
-    function index () {
+    function download () {
         $download = new Download;
         return $download->download();
     }

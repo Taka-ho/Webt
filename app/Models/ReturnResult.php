@@ -7,7 +7,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class ReturnResult extends Model
 {
-    //ユーザーのコードを検査して合否を決定する
     use HasFactory;
-    
 }
