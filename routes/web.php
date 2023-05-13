@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DownloadController;
+use App\Http\Controllers\ReturnResultController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,5 +23,6 @@ Route::get('/exam', function () {
     return view('exam');
 });
 
-Route::get('/exam/workBook', [DownloadController::class, 'index']);
+Route::get('/exam/workBook', [DownloadController::class, 'download']);
 
+Route::post('/exam/workBook/returnResult', [ReturnResultController::class, 'upload']);

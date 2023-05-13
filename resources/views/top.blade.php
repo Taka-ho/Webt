@@ -7,12 +7,12 @@
     <meta http-equiv='X-UA-Compatible' content='ie=edge'>
     @component('components.header')
     @endcomponent
-    <title>Webt(ウェッティー)</title>
+    <title>Webt(ウェブティー)</title>
 </head>
     <body>
         <div class='allSpaces'>  
             <div class='title'>
-                <h1>サービス名: Webt(ウェッティー)</h1>
+                <h1>サービス名: Webt(ウェッブティー)</h1>
             </div>
             <div class='overView'>
                 <h2>概要</h2>
@@ -28,7 +28,7 @@
                     ですので、その部分を私達が提供します。
                     皆さんで、ギークな会話を楽しみましょう!!
                 </p>
-                <p>ちなみにこのサイトLaravelで作ってるんだけど、色々おかしいところあると思うから、ぜひ検証ツールで見て笑ってね</p>
+                <p>ちなみにこのサイトLaravelで作ってるんだけど、色々おかしいところあると思うから、ぜひ検証ツールで見て笑ってねw</p>
             </div>
         </div>
     </body>

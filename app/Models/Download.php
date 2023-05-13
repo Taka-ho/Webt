@@ -10,16 +10,16 @@ class Download extends Model
 {
     use HasFactory;
     function countFiles () {
-        $allWorkBook = Storage::allFiles('workBook');
-        $numOfFiles = count($allWorkBook);
-        return $numOfFiles;
+        $allWorkBook = Storage::directories('workBook');
+        $numOfWorkBook = count($allWorkBook);
+        return $numOfWorkBook;
     }
 
     function download () {
         $min = 1;
         $max = $this->countFiles();
         $numOfWork = rand($min, $max);
-        $fileName = $numOfWork.'.txt';
-        return Storage::download('workBook/'.$fileName);
+        $workBookName = $numOfWork.'_exam';
+        return Storage::download('workBook/'.$workBookName.'/exam.zip');
     }
 }
