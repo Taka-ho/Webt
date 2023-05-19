@@ -9,15 +9,14 @@ class ReturnResultController extends Controller
 {
     public function upload(Request $request)
     {
-        // ファイルを受け取る
-        $file = $request->file('file');
-        // ファイルの保存先パスを指定する
-        $destinationPath = storage_path('app/public/uploads');
-
-        // アップロードされたファイルを指定したパスに保存する
-        $file->move($destinationPath, $file->getClientOriginalName());
-
+        $upload = new ReturnResult();
         // レスポンスを返す
-        return response()->json(['message' => 'You completed what is upload file']);
+        if ($request->hasFile('file')) {
+            $jsCode = file_get_contents($request->file('file')->getRealPath());
+            // ファイルを変数に格納する処理
+            return $upload->saveToDatabase($request, $jsCode);
+        } else {
+            return response()->json(['message' => 'ファイルが無いようです。CURL文を確認してください。']);
+        }
     }
 }
