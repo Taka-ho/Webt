@@ -19,4 +19,5 @@ class ReturnResultController extends Controller
             return response()->json(['message' => 'ファイルが無いようです。CURL文を確認してください。']);
         }
     }
+
 }
