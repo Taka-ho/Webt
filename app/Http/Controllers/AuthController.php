@@ -6,11 +6,13 @@ use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
 use SebastianBergmann\CodeUnit\Exception;
 use Illuminate\Support\Str;
-use App\Models\OrthUsersInfo;
-use App\Models\UsersCodes;
+use App\Models\UsersInfo;
+use Illuminate\Support\Facades\Cache;
+use Symfony\Component\Console\Exception\Exception as ConsoleException;
 
 class AuthController extends Controller
 {
+    private $githubUserId;
     public function redirectToGithub()
     {
         return Socialite::driver('github')->redirect();
@@ -27,11 +29,11 @@ class AuthController extends Controller
 
         // Githubからのレスポンスから必要な情報を取得
         $githubUserId = $request->input('user_id');
-
+        $GLOBALS['githubUserId'] = $githubUserId;
         // orth_users_info テーブルにデータを登録
-        $userInfo = new OrthUsersInfo;
-        $usersKey = Str::uuid(); // UUIDを生成して 'key' カラムに登録
-        $userInfo->key = $usersKey;
+        $userInfo = new UsersInfo;
+        $usersKey = Str::uuid(); // UUIDを生成して 'id' カラムに登録
+        $userInfo->id = $usersKey;
         $userInfo->personal_github_info = $githubUserId;
         $userInfo->save();
         $this->redirectToDiscord($usersKey);
@@ -45,39 +47,40 @@ class AuthController extends Controller
 
     public function handleDiscordCallback(Request $request)
     {
-        // Discordのコールバック処理
-    
         // Discordからのレスポンスから必要な情報を取得
         $discordUserId = $request->input('user_id');
-
         // orth_users_info テーブルにデータを登録
-        $userInfo = new OrthUsersInfo;
+        $userInfo = new UsersInfo;
         $userInfo->personal_discord_info = $discordUserId;
         $userInfo->save();
     
         // その他の処理やリダイレクトなどを行う
-        $this->redirect ($discordUserId);
+        $this->checkInfoInDB($discordUserId, 'discord');
+        $this->redirect($discordUserId);
     }
 
-    public function redirect ($discordUserId)
+    private function redirect ($discordUserId)
     {
-        $this->checkInfoInDB(OrthUsersInfo::where('personal_discord_info', $discordUserId)->value('key'), 'discord');
-
-        $id = Str::uuid()->toString();
-        $userCode = new UsersCodes;
-        $userCode->id = $id;
-        // コーディング試験ページに転送
-        return redirect()->to('http://localhost:3000/'.$id); 
+        $githubUserId = $GLOBALS['githubUserId'];
+        $userInfo = UsersInfo::where('personal_github_id', $$githubUserId)
+                    ->where('personal_discord_id', $discordUserId)
+                    ->first('id');
+        if($this->checkInfoInDB(Cache::table('users_info')->where('personal_github_info', 'personal_discord_info')->first(), 'discord') === true)
+        {
+            // コーディング試験ページに転送
+            return redirect()->to('http://localhost:3000/'.$userInfo->id); 
+        }
     }
 
-    private function checkInfoInDB($usersKey, $platform_name) {
+    private function checkInfoInDB($userId, $platform_name) {
         try {
-            $userInfo = OrthUsersInfo::where('key', $usersKey)->value('personal_'.$platform_name.'_info');
+            $userInfo = UsersInfo::where('id', $userId)->value('personal_'.$platform_name.'_info');
             if ($userInfo == null) {
-                throw new Exception($platform_name.'の情報がありません');
+                throw new ConsoleException($platform_name.'の情報がありません');
             }
-        } catch (Exception $e) {
+        } catch (ConsoleException $e) {
             return Socialite::driver($platform_name)->redirect();
         }
+        return true;
     }
 }

@@ -13,16 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('orth_users_info', function (Blueprint $table) {
+        Schema::create('users_info', function (Blueprint $table) {
             $table->id('key')->nullable(false);
-            $table->string('personal_github_info')->nullable(false);
-            $table->string('personal_discord_info')->nullable(false);
-        });
-
-        Schema::create('users_codes', function (Blueprint $table) {
-            $table->id('key')->nullable(false);
-            $table->text('value');
-            $table->foreign('key')->references('key')->on('orth_users_info')->onDelete('cascade');
+            $table->string('personal_github_id')->nullable(false);
+            $table->string('personal_discord_id')->nullable(false);
+            $table->text('users_code');
+            $table->timestamps();
         });
     }
 
@@ -33,7 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('orth_users_info');
-        Schema::dropIfExists('cache');
+        Schema::dropIfExists('users_info');
     }
 };

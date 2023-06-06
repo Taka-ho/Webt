@@ -4,10 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
-use Laravel\Socialite\Facades\Socialite;
 
-class orthUsersInfo extends Model
+class OrthUsersInfo extends Model
 {
     use HasFactory;
     protected $table = 'orth_users_info';
@@ -19,11 +17,12 @@ class orthUsersInfo extends Model
     protected $fillable = [
         'key',
         'personal_github_info',
-        'personal_discord_info'
+        'personal_discord_info',
+        'expiration'
     ];
 
     public function relational()
     {
-        return $this->hasOne(users_codes::class);
+        return $this->hasOne(UsersCodes::class);
     }
 }
