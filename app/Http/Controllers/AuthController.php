@@ -6,9 +6,8 @@ use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
 use SebastianBergmann\CodeUnit\Exception;
 use Illuminate\Support\Str;
-use App\Models\UsersInfo;
-use Illuminate\Support\Facades\Cache;
 use Symfony\Component\Console\Exception\Exception as ConsoleException;
+use Illuminate\Support\Facades\Redis;
 
 class AuthController extends Controller
 {
@@ -26,22 +25,23 @@ class AuthController extends Controller
             return redirect('/exam/explain');
         }
         $this->redirectToGithub();
-
+        $usersKey = Str::uuid(); // UUIDを生成して 'id' カラムに登録
+        $GLOBALS['usersKey'] = $usersKey;
         // Githubからのレスポンスから必要な情報を取得
         $githubUserId = $request->input('user_id');
         $GLOBALS['githubUserId'] = $githubUserId;
-        // orth_users_info テーブルにデータを登録
-        $userInfo = new UsersInfo;
-        $usersKey = Str::uuid(); // UUIDを生成して 'id' カラムに登録
-        $userInfo->id = $usersKey;
-        $userInfo->personal_github_info = $githubUserId;
-        $userInfo->save();
+
+        $idKey = 'user:{id}:ID';
+        Redis::set($idKey, $usersKey);
+
+        $personalGithubInfoKey = 'user:'.$usersKey.':'.$githubUserId;
+        Redis::set($personalGithubInfoKey, 'personal_github_info');
         $this->redirectToDiscord($usersKey);
     }
 
     public function redirectToDiscord($usersKey)
     {
-        $this->checkInfoInDB($usersKey, 'github');
+        $this->checkInfoInCache('github');
         return Socialite::driver('discord')->redirect();
     }
 
@@ -50,36 +50,35 @@ class AuthController extends Controller
         // Discordからのレスポンスから必要な情報を取得
         $discordUserId = $request->input('user_id');
         // orth_users_info テーブルにデータを登録
-        $userInfo = new UsersInfo;
-        $userInfo->personal_discord_info = $discordUserId;
-        $userInfo->save();
-    
+        $personalDiscordInfoKey = 'user:{id}:personal_discord_info';
+        Redis::set($discordUserId, 'personal_discord_info');
         // その他の処理やリダイレクトなどを行う
-        $this->checkInfoInDB($discordUserId, 'discord');
-        $this->redirect($discordUserId);
+        $this->checkInfoInCache('discord');
+        $this->redirect($personalDiscordInfoKey);
     }
 
-    private function redirect ($discordUserId)
+    private function redirect ($platformId)
     {
         $githubUserId = $GLOBALS['githubUserId'];
-        $userInfo = UsersInfo::where('personal_github_id', $$githubUserId)
-                    ->where('personal_discord_id', $discordUserId)
-                    ->first('id');
-        if($this->checkInfoInDB(Cache::table('users_info')->where('personal_github_info', 'personal_discord_info')->first(), 'discord') === true)
-        {
+        $usersKey = $GLOBALS['usersKey'];
+
+        if($this->checkInfoInCache('discord') === true) {
             // コーディング試験ページに転送
-            return redirect()->to('http://localhost:3000/'.$userInfo->id); 
+            return redirect()->to('http://localhost:3000/'.$githubUserId); 
         }
     }
 
-    private function checkInfoInDB($userId, $platform_name) {
+    private function checkInfoInCache($platformName) {
+        $usersKey = $GLOBALS['usersKey'];
+        $targetIdKey = 'user:{'.$usersKey.'}:ID';
+        $idValue = Redis::get($targetIdKey);
         try {
-            $userInfo = UsersInfo::where('id', $userId)->value('personal_'.$platform_name.'_info');
+            $userInfo = Redis::get('user:{'.$idValue.'}:personal_'.$platformName.'_info');
             if ($userInfo == null) {
-                throw new ConsoleException($platform_name.'の情報がありません');
+                throw new ConsoleException($platformName.'の情報がありません');
             }
         } catch (ConsoleException $e) {
-            return Socialite::driver($platform_name)->redirect();
+            return Socialite::driver($platformName)->redirect();
         }
         return true;
     }
