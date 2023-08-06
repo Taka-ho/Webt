@@ -44,7 +44,7 @@ return [
 
         'database' => [
             'driver' => 'database',
-            'table' => 'users_info',
+            'table' => 'cache',
             'connection' => 'mysql',
             'lock_connection' => null,
         ],
