@@ -17,5 +17,4 @@ class AuthController extends Controller
         Redis::expire($key, 7200);
         return redirect('http://localhost:3000/exam/'.$usersKey.'&key='.$key);
     }
-
 }
