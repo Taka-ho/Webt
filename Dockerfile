@@ -29,4 +29,3 @@ EXPOSE 8000
 
 # サーバーを起動
 CMD ["php", "artisan", "serve", "--host=0.0.0.0"]
-

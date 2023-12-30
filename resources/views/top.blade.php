@@ -1,4 +1,4 @@
-@vite(['resources/css/top.css'])
+
 <!DOCTYPE html>
 <html lang='ja'>
 <head>
@@ -7,7 +7,6 @@
     <meta http-equiv='X-UA-Compatible' content='ie=edge'>
     @component('components.header')
     @endcomponent
-    <title>Webt(ウェブティー)</title>
 </head>
     <body>
         <div class='allSpaces'>  

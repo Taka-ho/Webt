@@ -1,4 +1,3 @@
-@vite(['resources/css/top.css'])
 <!DOCTYPE html>
 <html lang='ja'>
 <head>
